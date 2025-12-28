@@ -90,26 +90,26 @@ class SeismicNotifier {
         });
 
         this.ws.on("message", async (msg) => {
-            logger.debug("Inbound event:" + msg);
+            logger.verbose("Inbound event:" + msg);
             
             const event = JSON.parse(msg);
             const action = event.action;
             
             // Check if we should process this action type
             if (!this.shouldProcess(action)) {
-                logger.debug(`Skipping action "${action}" (filtered out)`);
+                logger.verbose(`Skipping action "${action}" (filtered out)`);
                 return;
             }
 
             const payload = event.data;
             
-            logger.info(`Sending ${action} event to Home Assistant webhook`);
+            logger.http(`Sending ${action} event to Home Assistant webhook`);
             fetch(this.webhookUrl, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(payload),
             }).then((res) => {
-                logger.debug(`WebHook responded with status: ${res.status}`);
+                logger.http(`WebHook responded with status: ${res.status}`);
             }).catch((err) => {
                 logger.error("Error sending event to WebHook:" + JSON.stringify(err));
             });
