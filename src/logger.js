@@ -13,4 +13,10 @@ const logger = createLogger({
   ],
 });
 
+// Expose method to change log level at runtime
+logger.setLevel = (level) => {
+  logger.level = level;
+  logger.info(`Log level changed to: ${level}`);
+};
+
 module.exports = logger;
