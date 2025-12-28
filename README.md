@@ -19,6 +19,7 @@ Real-time earthquake alerts via SeismicPortal WebSocket.
    HA_WEBHOOK=your_home_assistant_webhook_url
    LOG_LEVEL=info
    ADMIN_PORT=3000
+   NOTIFICATION_FILTERS=create,update
    ```
 5. Start the application:
    ```bash
@@ -33,6 +34,7 @@ Real-time earthquake alerts via SeismicPortal WebSocket.
 - `HA_WEBHOOK` (required): Your Home Assistant webhook URL
 - `LOG_LEVEL` (optional, default: `info`): Log level - valid values: `error`, `warn`, `info`, `http`, `verbose`, `debug`, `silly`
 - `ADMIN_PORT` (optional, default: `3000`): Port for the admin HTTP server
+- `NOTIFICATION_FILTERS` (optional, default: `all`): Comma-separated list of notification types to process - valid values: `create`, `update`, `delete`, `other` (for unknown/future action types), `all`. Examples: `create,update` or `all`
 
 ## Runtime Management
 
@@ -80,6 +82,7 @@ Or, use a `.env` file (recommended for local/dev):
    HA_WEBHOOK=your_home_assistant_webhook_url
    LOG_LEVEL=info
    ADMIN_PORT=3000
+   NOTIFICATION_FILTERS=create,update
    ```
 2. Run:
    ```bash
