@@ -1,10 +1,12 @@
-const WebSocket = require("ws");
-
 require("dotenv").config();
+
+const WebSocket = require("ws");
+const logger = require("./logger");
+
 const HA_WEBHOOK = process.env.HA_WEBHOOK;
 
 if (!HA_WEBHOOK) {
-    console.error("HA_WEBHOOK environment variable is not set");
+    logger.error("HA_WEBHOOK environment variable is not set");
     process.exit(1);
 }
 
@@ -12,31 +14,32 @@ function connect() {
     const ws = new WebSocket("wss://www.seismicportal.eu/standing_order/websocket");
 
     ws.on("open", () => {
-        console.log("Connected to SeismicPortal");
+        logger.info("Connected to SeismicPortal");
     });
 
     ws.on("message", async (msg) => {
-        const event = JSON.parse(msg);
-        console.debug("Inbound event:", event);
+        logger.debug("Inbound event:" + msg);
         
+        const event = JSON.parse(msg);
         const payload = event.data;
         
-        console.debug(`Sending event to Home Assistant webhook: ${HA_WEBHOOK}`);
+        logger.debug(`Sending event to Home Assistant webhook: ${HA_WEBHOOK}`);
         fetch(HA_WEBHOOK, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(payload),
         }).then((res) => {
-            console.debug(`WebHook responded with status: ${res.status}`);
+            logger.debug(`WebHook responded with status: ${res.status}`);
         }).catch((err) => {
-            console.error("Error sending event to WebHook:", err);
+            logger.error("Error sending event to WebHook:" + JSON.stringify(err));
         });
     });
 
-    ws.on("error", console.error);
-
+    ws.on("error", (err) => {
+        logger.error("WebSocket error:" + JSON.stringify(err));
+    });
     ws.on("close", () => {
-        console.log("Disconnected – reconnecting...");
+        logger.info("Disconnected – reconnecting...");
         setTimeout(connect, 5000);
     });
 }

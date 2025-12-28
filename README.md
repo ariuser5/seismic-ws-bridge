@@ -43,6 +43,11 @@ Pass the `HA_WEBHOOK` environment variable at runtime (do NOT hardcode secrets i
 ```bash
 docker run -e HA_WEBHOOK=your_home_assistant_webhook_url <yourdockerhubusername>/seismic-ws-bridge:latest
 ```
+Optionally, you can set the log level by spefifying the `LOG_LEVEL` environment variable. For example, to set it to debug:
+```bash
+-e LOG_LEVEL=debug
+```
+
 
 Or, use a `.env` file (recommended for local/dev):
 1. Create a `.env` file in your project directory:
