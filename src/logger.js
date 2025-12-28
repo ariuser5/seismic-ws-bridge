@@ -1,5 +1,7 @@
 const { createLogger, format, transports } = require('winston');
 
+const validLevels = ['error', 'warn', 'info', 'http', 'verbose', 'debug', 'silly'];
+
 const logger = createLogger({
   level: process.env.LOG_LEVEL || 'info',
   format: format.combine(
@@ -18,5 +20,7 @@ logger.setLevel = (level) => {
   logger.level = level;
   logger.info(`Log level changed to: ${level}`);
 };
+
+logger.validLevels = validLevels;
 
 module.exports = logger;

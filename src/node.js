@@ -47,10 +47,9 @@ const server = http.createServer((req, res) => {
         req.on('end', () => {
             try {
                 const { level } = JSON.parse(body);
-                const validLevels = ['error', 'warn', 'info', 'http', 'verbose', 'debug', 'silly'];
-                if (!validLevels.includes(level)) {
+                if (!logger.validLevels.includes(level)) {
                     res.writeHead(400, { 'Content-Type': 'application/json' });
-                    res.end(JSON.stringify({ error: 'Invalid log level', validLevels }));
+                    res.end(JSON.stringify({ error: 'Invalid log level', validLevels: logger.validLevels }));
                     return;
                 }
                 logger.setLevel(level);
