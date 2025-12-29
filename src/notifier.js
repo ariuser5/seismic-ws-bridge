@@ -91,32 +91,44 @@ class SeismicNotifier {
 
         this.ws.on("message", async (msg) => {
             logger.verbose("Inbound event:" + msg);
-            
+
             const event = JSON.parse(msg);
             const action = event.action;
-            
+
             // Check if we should process this action type
             if (!this.shouldProcess(action)) {
                 logger.verbose(`Skipping action "${action}" (filtered out)`);
                 return;
             }
 
-            const payload = event.data;
-            
+            const payload = JSON.stringify(event);
+
             logger.http(`Sending ${action} event to Home Assistant webhook`);
             fetch(this.webhookUrl, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(payload),
-            }).then((res) => {
-                logger.http(`WebHook responded with status: ${res.status}`);
-            }).catch((err) => {
-                logger.error("Error sending event to WebHook:" + JSON.stringify(err));
-            });
+                body: payload,
+            })
+			.then((res) => {
+				logger.http(`WebHook responded with status: ${res.status}`);
+			})
+			.catch((err) => {
+				logger.error("Error sending event to WebHook:", {
+					message: err.message,
+					code: err.code,
+					cause: err.cause,
+				});
+				logger.debug("Full error object:", err);
+			});
         });
 
         this.ws.on("error", (err) => {
-            logger.error("WebSocket error:" + JSON.stringify(err));
+            logger.error("WebSocket error:", {
+				message: err.message,
+				code: err.code,
+				cause: err.cause,
+			});
+			logger.debug("Full error object:", err);
         });
 
         this.ws.on("close", () => {
