@@ -13,6 +13,24 @@ const NotificationTypes = {
 
 class SeismicNotifier {
     static validTypes = ['create', 'update', 'delete', 'other', 'all'];
+    
+    static closeCodeDescriptions = {
+        1000: "Normal Closure",
+        1001: "Going Away (server/client leaving)",
+        1002: "Protocol Error",
+        1003: "Unsupported Data",
+        1005: "No Status Received",
+        1006: "Abnormal Closure (no close frame)",
+        1007: "Invalid Frame Payload Data",
+        1008: "Policy Violation",
+        1009: "Message Too Big",
+        1010: "Mandatory Extension Missing",
+        1011: "Internal Server Error",
+        1012: "Service Restart",
+        1013: "Try Again Later",
+        1014: "Bad Gateway",
+        1015: "TLS Handshake Failure"
+    };
 
     constructor(webhookUrl, initialFilters = null) {
         this.webhookUrl = webhookUrl;
@@ -131,8 +149,14 @@ class SeismicNotifier {
 			logger.debug("Full error object:", err);
         });
 
-        this.ws.on("close", () => {
-            logger.info("Disconnected – reconnecting...");
+        this.ws.on("close", (code, reason) => {
+            const description = SeismicNotifier.closeCodeDescriptions[code] || `Unknown code (${code})`;
+            logger.warn("WebSocket disconnected", {
+                code: code,
+                reason: reason.toString() || "No reason provided",
+                message: description
+            });
+            logger.info("Reconnecting in 5 seconds...");
             setTimeout(() => this.connect(), 5000);
         });
     }
